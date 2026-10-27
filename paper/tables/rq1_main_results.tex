@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Empirical evaluation across scarcity levels $N \in \{10, 20, 50, 100\}$ on DermaMNIST and BloodMNIST. We report mean $\pm$ std over 3 independent seeds. Count-matched classical control matches sample budget $K=200$.}
+\label{tab:rq1_main_results}
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Method} & \textbf{N=10} & \textbf{N=20} & \textbf{N=50} & \textbf{N=100} \\
+\midrule
+\multicolumn{6}{l}{\textit{DERMAMNIST}} \\
+ & None (Baseline) & $0.010 \pm 0.010$ & $0.006 \pm 0.011$ & $0.008 \pm 0.008$ & $0.008 \pm 0.013$ \\
+ & Classical ($K=200$) & $0.007 \pm 0.013$ & $0.006 \pm 0.010$ & $0.006 \pm 0.011$ & $0.014 \pm 0.012$ \\
+ & DCGAN ($K=200$) & $0.007 \pm 0.013$ & $0.006 \pm 0.010$ & $0.006 \pm 0.011$ & $0.014 \pm 0.012$ \\
+\midrule
+\bottomrule
+\end{tabular}
+\end{table*}

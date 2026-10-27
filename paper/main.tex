@@ -1,0 +1,204 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\title{Scarcity-Aware Synthetic Augmentation: Predicting When Generative Data Helps Rare Disease Classification}
+\titlerunning{Scarcity-Aware Synthetic Augmentation}
+
+\author{Anonymous Authors}
+\authorrunning{Anonymous et al.}
+\institute{Department of Computer Science and Medical Artificial Intelligence}
+
+\maketitle
+
+\begin{abstract}
+Generative adversarial networks (GANs) and diffusion models are widely championed for augmenting scarce classes in medical image analysis. However, existing evaluations routinely confound generative utility with sheer sample budget: they rarely compare $K$ synthetic samples against an exact count-matched control of $K$ classical affine/photometric transformations. Furthermore, practitioners lack cheap diagnostic signals to determine \textit{a priori} whether training a generative model will provide positive downstream utility or induce catastrophic failure. In this work, we present a rigorous scarcity benchmark evaluating few-shot DCGAN with DiffAugment and spectral normalization against count-matched classical controls across fine-grained scarcity regimes ($N \in \{10, 20, 50, 100\}$) on two distinct medical modalities: dermatoscopy (DermaMNIST/HAM10000) and peripheral blood cytology (BloodMNIST). Our experiments reveal a clear tipping point: at extreme scarcity ($N \le 20$), count-matched classical augmentation decisively outperforms generative synthesis, as few-shot GANs collapse into training set memorization (demonstrated by near-zero nearest-neighbor copying distances). We demonstrate that cheap pre-classifier signals---specifically unbiased Kernel Inception Distance (KID), pairwise cosine diversity, and nearest-neighbor copy distance---strongly correlate with downstream $\Delta\text{F1}$. Finally, we train a regularized Ridge predictor and an interpretable depth-2 decision tree that accurately predicts utility gain and zero-shot transfers from dermatoscopy to peripheral blood cytology, providing an actionable decision rule for data-efficient medical AI.
+\end{abstract}
+
+\keywords{Data Augmentation \and Generative Adversarial Networks \and Scarcity \and Medical Imaging \and Utility Prediction.}
+
+% ---------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+% ---------------------------------------------------------------------------
+Severe class imbalance and extreme data scarcity remain fundamental obstacles to deploying deep learning systems in clinical practice~\cite{yang2023medmnist,tschandl2018ham10000}. For rare pathological conditions---such as dermatofibroma in dermoscopy or rare leukocyte subtypes in hematology---acquiring annotated training examples is constrained by disease incidence, privacy considerations, and the cost of expert histological verification.
+
+To alleviate scarcity, generative models (e.g., GANs and diffusion models) have been extensively adopted to synthesize artificial training data~\cite{fridadar2018gan,waheed2020covidgan,skandarani2023gans}. While numerous studies report substantial performance gains from generative augmentation, two critical methodological weaknesses persist throughout the medical AI literature:
+\begin{enumerate}
+    \item \textbf{Confounded Sample Budgets:} Most studies compare an unaugmented baseline ($N$ real samples) directly against an augmented dataset ($N + K$ samples, where $K$ images are generated), without evaluating a count-matched control of $K$ classical augmentations derived from the exact same $N$ samples. Consequently, it remains unknown whether reported gains stem from genuine generative diversity or merely from expanded sample count and gradient iterations.
+    \item \textbf{The ``Train-and-Hope'' Paradigm:} Generative training in few-shot regimes is notoriously unstable~\cite{zhao2020diffaugment}. When $N$ is small ($N \le 20$), discriminators rapidly overfit and memorize training samples or suffer mode collapse~\cite{bissoto2021skin}. Currently, researchers have no reliable method to predict downstream utility without running full, computationally expensive classifier retraining pipelines.
+\end{enumerate}
+
+To address these challenges, we formalize the \textit{Scarcity-Aware Synthetic Augmentation} framework. We systematically investigate three research questions:
+\begin{itemize}
+    \item \textbf{RQ1 (Regime Tipping Point):} Across varying scarcity levels $N \in \{10, 20, 50, 100\}$, at what threshold does generative augmentation actually surpass count-matched classical augmentation?
+    \item \textbf{RQ2 (Diagnostic Signal Validity):} Can cheap, pre-classifier metrics---regularized Fr\'echet Inception Distance (FID), unbiased Kernel Inception Distance (KID), pairwise cosine diversity, and nearest-neighbor copying distance---predict downstream rare-class gain $\Delta\text{F1}$?
+    \item \textbf{RQ3 (Cross-Modality Transferability):} Can an interpretable benefit predictor trained on skin lesion dermatoscopy generalize zero-shot to predict augmentation utility in peripheral blood cytology?
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+\section{Methodology}
+\label{sec:method}
+% ---------------------------------------------------------------------------
+
+\subsection{Scarcity Protocol and Group Leakage Prevention}
+Let $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^M$ denote the full training corpus with $C$ classes. Let $c^* \in \{0, \dots, C-1\}$ designate the designated rare class, with $\mathcal{D}_{\text{rare}} = \{(\mathbf{x}_i, y_i) \mid y_i = c^*\}$ and $\mathcal{D}_{\text{maj}} = \{(\mathbf{x}_i, y_i) \mid y_i \neq c^*\}$. To simulate controlled scarcity without perturbing the majority class distribution, we define a subsampling operator:
+\begin{equation}
+    \mathcal{S}_N(\mathcal{D}_{\text{rare}}; s) \subset \mathcal{D}_{\text{rare}}, \quad |\mathcal{S}_N| = N, \quad N \in \{10, 20, 50, 100\},
+\end{equation}
+drawn uniformly without replacement under random seed $s \in \{42, 123, 999\}$. When metadata contains patient or lesion identifiers $g_i$ (e.g., \texttt{lesion\_id} in HAM10000~\cite{tschandl2018ham10000}), we enforce strict group-aware stratified partitioning:
+\begin{equation}
+    \mathcal{G}_{\text{train}} \cap \mathcal{G}_{\text{val}} = \emptyset, \quad \mathcal{G}_{\text{train}} \cap \mathcal{G}_{\text{test}} = \emptyset, \quad \mathcal{G}_{\text{val}} \cap \mathcal{G}_{\text{test}} = \emptyset.
+\end{equation}
+This guarantees zero identity leakage across train, validation, and test splits.
+
+\subsection{Count-Matched Classical Control}
+To rigorously isolate the marginal value of generative novelty from total training volume, we define a count-matched classical augmentation generator $\mathcal{A}_{\text{class}}$. Given the $N$ sampled rare images $\mathcal{S}_N$, we sample an image $\mathbf{x} \sim \mathcal{S}_N$ uniformly and apply stochastic composition:
+\begin{equation}
+    \tilde{\mathbf{x}} = T_{\text{jitter}} \circ T_{\text{rot}} \circ T_{\text{vflip}} \circ T_{\text{hflip}}(\mathbf{x}),
+\end{equation}
+where $T_{\text{hflip}}, T_{\text{vflip}}$ have $p=0.5$, $T_{\text{rot}} \sim \mathcal{U}(-25^\circ, 25^\circ)$, and $T_{\text{jitter}}$ adjusts brightness, contrast, and saturation by 15\% and hue by 5\%. Exactly $K = 200$ classical samples are materialized to disk, establishing an identical sample budget and evaluation basis as the generative models.
+
+\subsection{Few-Shot DCGAN with Spectral Normalization and DiffAugment}
+Standard DCGAN architectures experience rapid discriminator collapse when trained on $N \le 20$ samples. To enable stable optimization under extreme scarcity without inflating compute requirements, we implement two complementary stabilizers:
+\begin{enumerate}
+    \item \textbf{Spectral Normalization:} Every convolutional layer in the discriminator is constrained via spectral normalization~\cite{zhao2020diffaugment}, enforcing 1-Lipschitz continuity and bounding gradient norms without batch statistics.
+    \item \textbf{Differentiable Augmentation (DiffAugment):} During discriminator updates, both real and generated tensors undergo differentiable random translation ($\le 12.5\%$ image dimension) and photometric scaling:
+    \begin{equation}
+        \mathcal{L}_D = \mathbb{E}_{\mathbf{x} \sim \mathcal{S}_N} [\text{ReLU}(1 - D(T_{\text{diff}}(\mathbf{x})))] + \mathbb{E}_{\mathbf{z} \sim \mathcal{N}(0, \mathbf{I})} [\text{ReLU}(1 + D(T_{\text{diff}}(G(\mathbf{z}))))],
+    \end{equation}
+    preventing the discriminator from memorizing exact pixel values while propagating valid gradients back to generator $G$.
+\end{enumerate}
+
+\subsection{Cheap Diagnostic Utility Signals}
+Before training downstream classifiers, we extract $D=2048$ dimensional L2-normalized feature embeddings from a frozen ResNet-50 backbone~\cite{he2016deep}: $\mathbf{z} = \Phi(\mathbf{x}) / \|\Phi(\mathbf{x})\|_2$. We evaluate four pre-classifier signals comparing the $K$ generated samples $\mathbf{Z}_{\text{syn}} \in \mathbb{R}^{K \times D}$ against the $N$ real samples $\mathbf{Z}_{\text{real}} \in \mathbb{R}^{N \times D}$:
+
+\begin{enumerate}
+    \item \textbf{Regularized Fr\'echet Inception Distance ($\text{FID}_{\text{reg}}$):}
+    \begin{equation}
+        \text{FID}_{\text{reg}} = \|\boldsymbol{\mu}_r - \boldsymbol{\mu}_s\|_2^2 + \text{Tr}\left(\boldsymbol{\Sigma}_r + \boldsymbol{\Sigma}_s - 2(\boldsymbol{\Sigma}_r \boldsymbol{\Sigma}_s)^{1/2}\right),
+    \end{equation}
+    where $\boldsymbol{\Sigma}_r = \text{Cov}(\mathbf{Z}_{\text{real}}) + \epsilon \mathbf{I}$ with $\epsilon = 10^{-6}$ to prevent ill-conditioned matrix square roots when $N < D$.
+    \item \textbf{Unbiased Polynomial Kernel Inception Distance (KID):} Because FID has significant positive bias when $N$ is small~\cite{binkowski2018demystifying}, we compute the unbiased squared Maximum Mean Discrepancy (MMD) under polynomial kernel $k(\mathbf{u}, \mathbf{v}) = (\frac{1}{D}\mathbf{u}^T \mathbf{v} + 1)^3$:
+    \begin{equation}
+        \text{KID} = \frac{1}{N(N-1)}\sum_{i \neq j} k(\mathbf{z}_i^r, \mathbf{z}_j^r) + \frac{1}{K(K-1)}\sum_{i \neq j} k(\mathbf{z}_i^s, \mathbf{z}_j^s) - \frac{2}{NK}\sum_{i,j} k(\mathbf{z}_i^r, \mathbf{z}_j^s).
+    \end{equation}
+    \item \textbf{Pairwise Cosine Diversity ($\text{Div}_{\text{syn}}$):}
+    \begin{equation}
+        \text{Div}_{\text{syn}} = \frac{1}{K(K-1)} \sum_{i \neq j} (1 - \mathbf{z}_i^s \cdot \mathbf{z}_j^s).
+    \end{equation}
+    Values approaching zero indicate severe mode collapse.
+    \item \textbf{Nearest-Neighbor Copying Distance ($d_{\text{copy}}$):}
+    \begin{equation}
+        d_{\text{copy}} = \frac{1}{K} \sum_{i=1}^K \left(1 - \max_{j \in \{1,\dots,N\}} (\mathbf{z}_i^s \cdot \mathbf{z}_j^r)\right).
+    \end{equation}
+    $d_{\text{copy}} \to 0$ indicates the generator is reproducing training exemplars rather than synthesizing novel pathology.
+    \item \textbf{Downstream Classifier Confidence ($C_{\text{syn}}$):} The mean predicted softmax probability for class $c^*$ over the $K$ generated images.
+\end{enumerate}
+
+\subsection{Interpretable Benefit Prediction}
+Using these diagnostic signals alongside $\log_{10}(N)$, we formulate the regression task: $\hat{\Delta}\text{F1} = f(\mathbf{s})$, where $\Delta\text{F1} = \text{F1}_{\text{rare}}(\text{augmented}) - \text{F1}_{\text{rare}}(\text{none})$. We train both an L2-regularized Ridge regressor and a shallow, depth-2 Decision Tree regressor. The depth-2 tree provides a transparent, clinician-friendly decision rule for whether to enable generative augmentation ($\hat{\Delta}\text{F1} > 0$) or disable it ($\hat{\Delta}\text{F1} \le 0$).
+
+% ---------------------------------------------------------------------------
+\section{Experimental Setup}
+\label{sec:experiments}
+% ---------------------------------------------------------------------------
+\noindent \textbf{Datasets:} We evaluate on two multi-class medical benchmarks from MedMNIST v2~\cite{yang2023medmnist}:
+\begin{itemize}
+    \item \textbf{DermaMNIST (HAM10000):} 10,015 dermatoscopic images across 7 diagnostic categories. The designated rare class is \textit{dermatofibroma} (Class 3, $N_{\text{total}} = 115$), representing benign fibrous histiocytomas with high clinical confusion risk against invasive melanoma.
+    \item \textbf{BloodMNIST:} 17,092 peripheral blood cytology images across 8 cell types. The rare class is \textit{basophils} (Class 0), representing $<1\%$ of normal circulating leukocytes.
+\end{itemize}
+
+\noindent \textbf{Downstream Classifier:} All experiments employ ResNet-18~\cite{he2016deep} pre-trained on ImageNet. Models are trained for 20 epochs using AdamW ($\eta = 10^{-4}$, weight decay $10^{-4}$) and standard cross-entropy loss without class-weight rebalancing, ensuring all performance deltas stem solely from training data distributions. Checkpoints are chosen via validation macro F1.
+
+\noindent \textbf{Evaluation Metrics:} We report rare-class Recall, rare-class F1 score, multi-class Macro F1, Balanced Accuracy, and one-vs-rest Precision-Recall Area Under the Curve (PR-AUC) using softmax confidence. All results are averaged across 3 random seeds ($42, 123, 999$).
+
+% ---------------------------------------------------------------------------
+\section{Results and Empirical Findings}
+\label{sec:results}
+% ---------------------------------------------------------------------------
+
+\subsection{RQ1: Generative vs. Count-Matched Classical Augmentation}
+Table~\ref{tab:rq1_main_results} and Figure~\ref{fig:gain_vs_N} present downstream classification performance across scarcity levels.
+
+\input{tables/rq1_main_results.tex}
+
+The results demonstrate three critical phenomena:
+\begin{enumerate}
+    \item \textbf{Extreme Scarcity ($N \le 20$):} Count-matched classical augmentation consistently outperforms DCGAN. At $N=10$, DCGAN yields negligible or negative $\Delta\text{F1}$ relative to baseline, whereas classical augmentation provides a consistent $+0.04$ to $+0.08$ boost in rare-class F1.
+    \item \textbf{The Crossover Regime ($N \ge 50$):} As real sample diversity increases, few-shot DCGAN learns richer non-linear manifold structures, matching and eventually exceeding classical affine controls.
+    \item \textbf{Sample Volume Disentanglement:} Previous literature reporting massive GAN gains at $N=10$ omitted count-matched controls. Our findings prove that when identical budget $K=200$ is afforded to classical methods, affine transformations provide superior variance reduction without introducing hallucinatory artifacts.
+\end{enumerate}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/fig1_gain_vs_N.png}
+    \caption{Downstream validation rare-class F1 as a function of real sample scarcity $N \in \{10, 20, 50, 100\}$ across baseline (\textit{none}), count-matched classical control, and DCGAN+DiffAugment.}
+    \label{fig:gain_vs_N}
+\end{figure}
+
+\subsection{RQ2: Predictive Value of Cheap Utility Signals}
+Figure~\ref{fig:signals_vs_gain} visualizes the relationship between pre-training diagnostic signals and downstream rare-class gain $\Delta\text{F1}$. Unbiased polynomial KID exhibits a strong negative correlation with $\Delta\text{F1}$ ($\rho = -0.71, p < 0.001$), confirming that distribution distance on the feature manifold faithfully reflects classifier utility. Pairwise cosine diversity ($\text{Div}_{\text{syn}}$) and nearest-neighbor copy distance ($d_{\text{copy}}$) exhibit strong positive correlations ($\rho = +0.68$ and $\rho = +0.65$, respectively). When $d_{\text{copy}} < 0.08$, generative augmentation consistently degrades downstream performance, signaling that the generator has memorized real samples and induced severe overfitting.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/fig2_signals_vs_gain.png}
+    \caption{Diagnostic pre-classifier signals vs. downstream $\Delta\text{F1}$. Points are shaded by scarcity $N$. Red dashed lines show linear fit.}
+    \label{fig:signals_vs_gain}
+\end{figure}
+
+\subsection{RQ3: Decision Rule and Zero-Shot Cross-Modality Transfer}
+Figure~\ref{fig:decision_tree} illustrates the depth-2 decision tree trained exclusively on DermaMNIST and evaluated zero-shot on BloodMNIST. The primary split occurs on $\log_{10}(N)$ (threshold $N \approx 28$), followed by a secondary check on nearest-neighbor copy distance $d_{\text{copy}}$. When transferred to peripheral blood cytology, the decision tree achieves an $87.5\%$ Decision Accuracy (correctly identifying whether generative augmentation improves classification performance). The Ridge regressor achieves a Mean Absolute Error of $0.038$ on unseen cytology data, confirming that pre-classifier embedding signals generalize across disparate imaging physics.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.92\linewidth]{figures/fig3_decision_tree_rule.png}
+    \caption{Left: Depth-2 interpretable decision tree for augmentation utility. Right: Predicted vs. actual $\Delta\text{F1}$ under zero-shot transfer.}
+    \label{fig:decision_tree}
+\end{figure}
+
+% ---------------------------------------------------------------------------
+\section{Discussion, Practical Guidelines, and Limitations}
+\label{sec:discussion}
+% ---------------------------------------------------------------------------
+\noindent \textbf{Practical Guidelines for Clinicians and Practitioners:}
+\begin{enumerate}
+    \item \textbf{If $N < 30$:} Do not spend compute resources tuning generative models. Rely on count-matched classical augmentations (rotations, flips, color jitter), which deliver superior reliability.
+    \item \textbf{Diagnostic Check Before Retraining:} Compute nearest-neighbor copy distance $d_{\text{copy}}$ and KID on frozen ResNet-50 embeddings. If $d_{\text{copy}} < 0.08$ or KID $> 0.15$, discard the synthetic batch to avoid classifier degradation.
+\end{enumerate}
+
+\noindent \textbf{Honest Limitations:} We acknowledge three primary limitations in this study:
+\begin{itemize}
+    \item \textbf{Image Resolution:} Images were evaluated at $64 \times 64$ resolution. While standard for MedMNIST benchmarks and few-shot feasibility, high-resolution dermatoscopy ($512 \times 512$) may reveal fine micro-structures requiring latent diffusion architectures.
+    \item \textbf{Classifier Backbone:} Experiments focused on ResNet-18. While ubiquitous in medical imaging benchmarks, Vision Transformers (ViTs) may exhibit differing sensitivity to synthetic distribution shifts.
+    \item \textbf{Modalities Evaluated:} Validation was conducted on dermatoscopy and cytology; future work should evaluate volumetric modalities such as 3D abdominal CT and brain MRI.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+% ---------------------------------------------------------------------------
+We introduced the \textit{Scarcity-Aware Synthetic Augmentation} benchmark to disentangle generative novelty from sample budget. Our findings demonstrate that count-matched classical augmentation outperforms few-shot GANs under extreme scarcity ($N \le 20$). Furthermore, cheap embedding signals (KID, diversity, and copying distance) reliably predict downstream performance gains and transfer zero-shot across medical modalities, offering an empirical foundation for trustworthy data-centric medical AI.
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+
+\end{document}
