@@ -1,0 +1,28 @@
+# Arm S1: Minority-Targeted MixUp & CutMix
+base_config: "configs/base_config.yaml"
+arm_id: "S1"
+experiment_name: "arm_s1_mixup_minority"
+description: "MixUp / CutMix interpolation specifically applied to minority class ('df') instances during batch collation."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "cross_entropy"
+
+augmentation:
+  type: "minority_mixup_cutmix"
+  mixup_alpha: 0.4
+  cutmix_alpha: 1.0
+  prob: 0.5
+  minority_only_source: true # MixUp pairs always involve at least one minority sample

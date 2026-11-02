@@ -1,0 +1,87 @@
+# Base Configuration for Rare-Class Skin Lesion Benchmark
+experiment_name: "base_experiment"
+description: "Base configuration with default hyperparameters and leakage-controlled protocol"
+
+# Experiment Protocol
+protocol:
+  n_folds: 5
+  seeds: [42, 1337, 2024]
+  target_minority_class: "df"
+  target_minority_index: 3
+  class_names: ["akiec", "bcc", "bkl", "df", "mel", "nv", "vasc"]
+  num_classes: 7
+  split_file: "data/splits.csv"
+  metadata_file: "data/metadata.csv"
+  external_test_metadata: "data/isic2019_external_metadata.csv"
+  images_dir: "data/images"
+  cache_dir: "data/cache_224"
+
+# Compute & Runtime
+compute:
+  device: "auto" # "auto", "cuda", "cpu", "mps"
+  mixed_precision: true
+  num_workers: 2
+  pin_memory: true
+  checkpoint_dir: "results/checkpoints"
+  log_dir: "results/logs"
+  figures_dir: "results/figures"
+  tables_dir: "results/tables"
+
+# Default Model Specifications
+model:
+  family: "cnn" # "cnn", "foundation_embed", "foundation_finetune"
+  backbone: "tf_efficientnet_b0.ns_jft_in1k" # or "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+# Training Parameters
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  min_lr: 1.0e-6
+  weight_decay: 1.0e-4
+  optimizer: "adamw"
+  scheduler: "cosine"
+  early_stopping_patience: 7
+  early_stopping_metric: "val_minority_recall"
+  early_stopping_mode: "max"
+
+# Loss Settings
+loss:
+  type: "cross_entropy" # "cross_entropy", "weighted_ce", "focal"
+  label_smoothing: 0.0
+  focal_gamma: 2.0
+  focal_alpha: null
+
+# Sampler Settings
+sampler:
+  type: "standard" # "standard", "balanced", "minority_oversample"
+
+# Data Augmentation
+augmentation:
+  type: "none" # "none", "classical", "mixup_minority", "cutmix_minority"
+  horizontal_flip: false
+  vertical_flip: false
+  rotation_degrees: 0
+  color_jitter: null
+  mixup_alpha: 0.2
+  minority_only_aug: false
+
+# Synthetic Augmentation Parameters
+synthetic:
+  enabled: false
+  method: "none" # "none", "mixup", "sd15_lora", "stylegan2"
+  ratio: 0.0 # 0.5, 1.0, 2.0 (relative to real training minority count)
+  sd_model_id: "runwayml/stable-diffusion-v1-5"
+  lora_rank: 4
+  img_size: 224
+  fid_eval: true
+  nn_filter_threshold: 0.95 # DINOv2 cosine distance threshold to prevent memorization
+
+# Trust & Calibration
+evaluation:
+  temperature_scaling: true
+  uncertainty_thresholds: [0.5, 0.6, 0.7, 0.8, 0.9]
+  gradcam_target_layers: ["conv_head"]

@@ -1,0 +1,35 @@
+# Arm P4: DINOv2 ViT-S/14 Partial Fine-Tuning
+base_config: "configs/base_config.yaml"
+arm_id: "P4"
+experiment_name: "arm_p4_dinov2_finetune"
+description: "DINOv2 ViT-S/14 with earlier layers frozen and the last 3 transformer encoder blocks + classification head fine-tuned with a low learning rate."
+
+model:
+  family: "foundation_finetune"
+  backbone: "facebook/dinov2-small"
+  freeze_blocks_except_last: 3
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 16
+  epochs: 15
+  lr: 2.0e-5 # Low learning rate to protect foundation representations
+  head_lr: 2.0e-4
+  weight_decay: 1.0e-2
+  optimizer: "adamw"
+  scheduler: "cosine"
+  early_stopping_patience: 5
+
+loss:
+  type: "cross_entropy"
+
+augmentation:
+  type: "classical"
+  horizontal_flip: true
+  vertical_flip: true
+  rotation_degrees: 30
+  color_jitter:
+    brightness: 0.1
+    contrast: 0.1
+    saturation: 0.1

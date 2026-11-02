@@ -1,0 +1,26 @@
+# Arm P5: Best Pretrained Setup + Focal Loss
+base_config: "configs/base_config.yaml"
+arm_id: "P5"
+experiment_name: "arm_p5_best_pretrained_focal"
+description: "DINOv2 ViT-S/14 embeddings paired with MLP head and Focal Loss (gamma=2.0) targeting hard minority dermoscopy samples."
+
+model:
+  family: "foundation_embed"
+  backbone: "facebook/dinov2-small"
+  embedding_dim: 384
+  head_type: "mlp"
+  hidden_dim: 128
+  dropout: 0.3
+  num_classes: 7
+
+head_training:
+  epochs: 50
+  batch_size: 64
+  lr: 0.001
+  weight_decay: 1.0e-3
+  early_stopping_patience: 10
+
+loss:
+  type: "focal"
+  focal_gamma: 2.0
+  focal_alpha: null

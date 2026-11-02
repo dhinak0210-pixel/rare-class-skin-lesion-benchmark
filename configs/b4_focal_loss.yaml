@@ -1,0 +1,37 @@
+# Arm B4: EfficientNet-B0 + Focal Loss
+base_config: "configs/base_config.yaml"
+arm_id: "B4"
+experiment_name: "arm_b4_focal_loss"
+description: "Fine-tuned EfficientNet-B0 with classical augmentation and Focal Loss (gamma=2.0) to dynamically downweight easy well-classified majority samples."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "focal"
+  focal_gamma: 2.0
+  focal_alpha: null # Optional class weighting factor
+
+sampler:
+  type: "standard"
+
+augmentation:
+  type: "classical"
+  horizontal_flip: true
+  vertical_flip: true
+  rotation_degrees: 45
+  color_jitter:
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.05

@@ -1,0 +1,18 @@
+# Arm P3: BiomedCLIP Frozen Embeddings + Linear Head
+base_config: "configs/base_config.yaml"
+arm_id: "P3"
+experiment_name: "arm_p3_biomedclip_linear"
+description: "Domain-specific biomedical foundation model BiomedCLIP (microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224 via open_clip) with linear classification probe."
+
+model:
+  family: "foundation_embed"
+  backbone: "hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224"
+  embedding_dim: 512
+  head_type: "logistic_regression" # or linear probe
+  num_classes: 7
+
+head_training:
+  solver: "lbfgs"
+  max_iter: 1000
+  c_param: 1.0
+  class_weight: null

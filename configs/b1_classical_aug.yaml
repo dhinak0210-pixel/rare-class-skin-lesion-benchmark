@@ -1,0 +1,35 @@
+# Arm B1: EfficientNet-B0 + Classical Augmentation
+base_config: "configs/base_config.yaml"
+arm_id: "B1"
+experiment_name: "arm_b1_classical_aug"
+description: "Fine-tuned EfficientNet-B0 with classical data augmentations (horizontal flip, vertical flip, random rotation +-45 deg, color jitter)."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "cross_entropy"
+
+sampler:
+  type: "standard"
+
+augmentation:
+  type: "classical"
+  horizontal_flip: true
+  vertical_flip: true
+  rotation_degrees: 45
+  color_jitter:
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.05

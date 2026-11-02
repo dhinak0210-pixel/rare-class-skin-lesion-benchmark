@@ -1,0 +1,29 @@
+# Arm S3 (Stretch): StyleGAN2-ADA / DCGAN Minority Generator
+base_config: "configs/base_config.yaml"
+arm_id: "S3"
+experiment_name: "arm_s3_stylegan2_ada"
+description: "StyleGAN2-ADA / Adaptive Data Augmentation GAN trained on training-fold 'df' images with diffaugment."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "cross_entropy"
+
+synthetic:
+  enabled: true
+  method: "stylegan2_ada"
+  ratio: 1.0
+  img_size: 224
+  fid_eval: true
+  nn_filter_threshold: 0.95

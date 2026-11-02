@@ -1,0 +1,18 @@
+# Arm P1: DINOv2 ViT-S/14 Frozen Embeddings + Logistic Regression
+base_config: "configs/base_config.yaml"
+arm_id: "P1"
+experiment_name: "arm_p1_dinov2_logreg"
+description: "Self-supervised DINOv2 ViT-S/14 (facebook/dinov2-small) extracted frozen embeddings (384-d) with L2-regularized multinomial Logistic Regression head."
+
+model:
+  family: "foundation_embed"
+  backbone: "facebook/dinov2-small"
+  embedding_dim: 384
+  head_type: "logistic_regression"
+  num_classes: 7
+
+head_training:
+  solver: "lbfgs"
+  max_iter: 1000
+  c_param: 1.0
+  class_weight: null # Standard unweighted baseline

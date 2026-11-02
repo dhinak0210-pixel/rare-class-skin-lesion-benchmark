@@ -1,0 +1,91 @@
+# Benchmark Progress & Roadmap Checklist
+
+**Project Title:** Does Synthetic Data Really Help? A Leakage-Controlled Benchmark of Pretrained Models, Imbalance Losses and Synthetic Augmentation for Minority-Class Skin Lesion Classification  
+**Target Minority Class:** Dermatofibroma (`df`, 115 images in HAM10000)  
+**Primary Metric:** Minority-class recall (with mean ± std, 95% bootstrap CIs, paired tests)  
+**Protocol:** 5-fold StratifiedGroupKFold grouped by `lesion_id`, repeated across 3 seeds (15 folds total), strict train-only synthesis, zero patient overlap.
+
+---
+
+## Phase Breakdown & Tracking
+
+- [x] **Phase 0: Project Setup, Environment & Progress Tracking**
+  - [x] Canonical directory structure (`configs/`, `data/`, `src/`, `notebooks/`, `scripts/`, `results/`, `docs/`, `app/`, `report/`, `tests/`)
+  - [x] Production & research dependencies defined in `requirements.txt`
+  - [x] Environment configuration notes (`environment.md`)
+  - [x] MIT License added
+  - [x] Master progress checklist initialized (`docs/PROGRESS.md`)
+
+- [ ] **Phase 1: Data Acquisition, Leak-Free Splitting & Leakage Verification**
+  - [ ] HAM10000 download script (`scripts/download_data.sh`) & metadata validator
+  - [ ] Grouped stratified splitting (`scripts/make_splits.py`) by `lesion_id` across 5 folds and 3 seeds (`data/splits.csv`)
+  - [ ] Exploratory Data Analysis (EDA) generation with class/lesion distributions saved to `results/figures/`
+  - [ ] Automated leakage tests (`tests/test_splits.py`, `tests/test_leakage.py`) confirming zero lesion overlap between train/val/test
+
+- [ ] **Phase 2: CPU End-to-End Pipeline Smoke Test**
+  - [ ] Modular components in `src/` (`dataset.py`, `models.py`, `losses.py`, `train.py`, `eval.py`, `utils.py`)
+  - [ ] DermaMNIST / synthetic toy verification on CPU (`tests/test_pipeline_smoke.py`)
+  - [ ] Validation that metrics calculations match `scikit-learn` exactly (`tests/test_metrics.py`)
+
+- [ ] **Phase 3: CNN Baselines (B0–B4) on HAM10000**
+  - [ ] B0: Plain cross-entropy EfficientNet-B0
+  - [ ] B1: B0 + Classical augmentations (flips, affine, color jitter)
+  - [ ] B2: B1 + Weighted Random Sampler (balanced oversampling)
+  - [ ] B3: B1 + Class-weighted cross-entropy loss
+  - [ ] B4: B1 + Focal loss ($\gamma=2$)
+  - [ ] Checkpoint-resumable Kaggle GPU runner notebook (`notebooks/kaggle_runner_baselines.ipynb`)
+
+- [ ] **Phase 4: Pretrained Foundation Models (P1–P5)**
+  - [ ] Embeddings extractor (`src/embed.py`) for DINOv2 (`facebook/dinov2-small`) and BiomedCLIP
+  - [ ] P1: DINOv2 ViT-S/14 frozen embeddings + Logistic Regression
+  - [ ] P2: DINOv2 frozen embeddings + Class-Weighted MLP
+  - [ ] P3: BiomedCLIP frozen embeddings + Linear Head
+  - [ ] P4: DINOv2 partial fine-tuning (last 2–4 blocks, low learning rate)
+  - [ ] P5: Best foundation setup + Focal Loss
+  - [ ] Kaggle GPU runner notebook (`notebooks/kaggle_runner_pretrained.ipynb`)
+
+- [ ] **Phase 5: Generative Synthetic Augmentation (S1–S3)**
+  - [ ] Strict isolation guard: generative models train ONLY on training fold `df` images
+  - [ ] S1: Minority-targeted MixUp and CutMix
+  - [ ] S2: Stable Diffusion 1.5 + LoRA fine-tuning on training `df` at 50%, 100%, 200% ratios
+  - [ ] S3: StyleGAN2-ADA / DCGAN minority generator (stretch arm)
+  - [ ] Synthetic evaluation: FID score against real fold `df`, DINOv2 nearest-neighbor memorization filter
+  - [ ] Blind real-vs-synthetic diagnostic grid generation
+  - [ ] Few-shot curve evaluation (25%, 50%, 100% minority training sizes)
+  - [ ] Final combined arm: Best Pretrained + Imbalance Loss + Synthetic Augmentation
+
+- [ ] **Phase 6: Trust, Calibration & Explainability**
+  - [ ] Post-hoc temperature scaling on validation fold & Expected Calibration Error (ECE)
+  - [ ] Selective prediction ("Uncertain, please review") referral curves and threshold tuning
+  - [ ] Explainability maps: Grad-CAM for EfficientNet-B0 and Attention Rollout for DINOv2
+  - [ ] Export illustrative panels: correctly classified, false negatives, and confused minority cases
+
+- [ ] **Phase 7: External Out-of-Distribution Validation (Cleaned ISIC 2019)**
+  - [ ] Disjoint ISIC 2019 subset extraction (filtering out HAM10000 overlaps via lesion IDs and image hashes)
+  - [ ] Documented dataset reconciliation in `docs/external_set.md`
+  - [ ] Zero-shot evaluation of top benchmark models on external test set
+
+- [ ] **Phase 8: Rigorous Statistical Aggregation & Publication Figures**
+  - [ ] Metric aggregation across 15 evaluations per arm (5 folds × 3 seeds)
+  - [ ] Paired bootstrap confidence intervals (95%) and Wilcoxon signed-rank tests
+  - [ ] Publication figures (minority recall comparison, few-shot curves, synthetic ratio ablation, ROC/PR curves)
+  - [ ] Summary LaTeX and Markdown result tables
+
+- [ ] **Phase 9: Interactive Gradio Demo & Deployment Packaging**
+  - [ ] Gradio web application (`app/app.py`) with image upload, classification, uncertainty flag, and Grad-CAM overlay
+  - [ ] CPU-optimized inference, Hugging Face Spaces deployment manifests (`app/README.md`, `app/requirements.txt`)
+  - [ ] Clinical disclaimer: "Research prototype. Not for clinical use."
+
+- [ ] **Phase 10: Academic Report, Methodology & Limitations**
+  - [ ] Comprehensive manuscript / technical report (`report/report.md`)
+  - [ ] Complete presentation slides outline (`report/slides_outline.md`)
+  - [ ] Detailed methodology document (`docs/methodology.md`) and honest limitations (`docs/limitations.md`)
+  - [ ] Benchmark README with reproducibility instructions
+
+---
+
+## Log of Completed Actions
+- **Phase 0 Completed:**
+  - Standardized repository layout created.
+  - Core requirements.txt created with strict version constraints.
+  - Progression log and verification plan outlined.

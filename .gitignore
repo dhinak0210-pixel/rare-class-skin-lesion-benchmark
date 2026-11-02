@@ -14,6 +14,17 @@ __pycache__/
 data/medmnist_raw/
 data/images/
 data/generated/
+data/cache_224/
+data/*.h5
+data/*.npy
+
+# Checkpoints and Model Weights
+results/checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
 
 # Archive bundles
 *.zip
@@ -24,3 +35,4 @@ data/generated/
 .idea/
 .DS_Store
 *.swp
+

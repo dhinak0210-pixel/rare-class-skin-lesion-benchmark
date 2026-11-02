@@ -1,0 +1,27 @@
+# Arm B0: Baseline Plain Cross-Entropy
+base_config: "configs/base_config.yaml"
+arm_id: "B0"
+experiment_name: "arm_b0_plain_ce"
+description: "Fine-tuned EfficientNet-B0 with ImageNet pretraining, standard empirical risk minimization (plain cross-entropy), no augmentation, standard data sampling."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "cross_entropy"
+
+sampler:
+  type: "standard"
+
+augmentation:
+  type: "none"

@@ -1,0 +1,32 @@
+# Final Combined Arm: Best Pretrained + Best Imbalance Loss + Best Synthetic Augmentation
+base_config: "configs/base_config.yaml"
+arm_id: "FINAL_COMBINED"
+experiment_name: "arm_final_combined"
+description: "Synthesis of the best individual findings across foundation embeddings, imbalance mitigation, and validated non-leaking synthetic augmentation."
+
+model:
+  family: "foundation_embed"
+  backbone: "facebook/dinov2-small"
+  embedding_dim: 384
+  head_type: "mlp"
+  hidden_dim: 128
+  dropout: 0.3
+  num_classes: 7
+
+head_training:
+  epochs: 50
+  batch_size: 64
+  lr: 0.001
+  weight_decay: 1.0e-3
+  early_stopping_patience: 10
+
+loss:
+  type: "focal"
+  focal_gamma: 2.0
+  focal_alpha: null
+
+synthetic:
+  enabled: true # Activated only if synthetic demonstrates positive delta-recall on validation fold
+  method: "sd15_lora"
+  ratio: 1.0
+  nn_filter_threshold: 0.95

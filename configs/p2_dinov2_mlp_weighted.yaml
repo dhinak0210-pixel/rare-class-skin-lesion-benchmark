@@ -1,0 +1,25 @@
+# Arm P2: DINOv2 ViT-S/14 Frozen Embeddings + Class-Weighted MLP
+base_config: "configs/base_config.yaml"
+arm_id: "P2"
+experiment_name: "arm_p2_dinov2_mlp_weighted"
+description: "DINOv2 ViT-S/14 frozen embeddings with a non-linear 2-layer MLP head (384 -> 128 -> 7), ReLU, Dropout (0.3), and class-weighted cross-entropy loss."
+
+model:
+  family: "foundation_embed"
+  backbone: "facebook/dinov2-small"
+  embedding_dim: 384
+  head_type: "mlp"
+  hidden_dim: 128
+  dropout: 0.3
+  num_classes: 7
+
+head_training:
+  epochs: 50
+  batch_size: 64
+  lr: 0.001
+  weight_decay: 1.0e-3
+  early_stopping_patience: 10
+
+loss:
+  type: "weighted_ce"
+  weight_scheme: "balanced"

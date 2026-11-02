@@ -1,0 +1,30 @@
+# Arm S2 (100% Ratio): Stable Diffusion 1.5 + LoRA Synthetic Augmentation
+base_config: "configs/base_config.yaml"
+arm_id: "S2_100"
+experiment_name: "arm_s2_sd15_lora_100"
+description: "Stable Diffusion 1.5 fine-tuned with LoRA on training-fold 'df' images only. Generates 100% additional synthetic 'df' images (1:1 ratio) for training."
+
+model:
+  family: "cnn"
+  backbone: "efficientnet_b0"
+  pretrained: true
+  dropout: 0.2
+  num_classes: 7
+
+training:
+  batch_size: 32
+  epochs: 25
+  lr: 0.0003
+  weight_decay: 1.0e-4
+
+loss:
+  type: "cross_entropy"
+
+synthetic:
+  enabled: true
+  method: "sd15_lora"
+  ratio: 1.0 # 100% of real training minority count
+  lora_rank: 4
+  img_size: 224
+  fid_eval: true
+  nn_filter_threshold: 0.95
