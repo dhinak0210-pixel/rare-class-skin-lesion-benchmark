@@ -76,6 +76,7 @@ research_paper/
 │   ├── stats.py                 # 95% bootstrap CIs, paired Wilcoxon tests, table generators
 │   └── gradcam.py               # Saliency maps (Grad-CAM & attention rollout)
 ├── notebooks/                   # Self-contained Google Colab & GPU runner notebooks
+│   ├── colab_dataset_download.ipynb  # 📥 Automated Dataset Downloader & Direct Mirrors Pipeline
 │   ├── colab_runner_master.ipynb     # 🚀 1-Click Autonomous Master Runner (All Arms & Persistence)
 │   ├── colab_runner_baselines.ipynb  # 🔬 Runs B0–B4 (CNN Baselines) on Colab T4 GPU
 │   ├── colab_runner_pretrained.ipynb # 🔬 Runs P1–P5 (DINOv2 & BiomedCLIP Feature Probes)
@@ -146,6 +147,7 @@ To run the complete benchmark on the full 10,015-image HAM10000 dataset with zer
 ### Notebook Options in `notebooks/`:
 | Notebook | Target Paradigm | Est. Colab Runtime (T4) | Description |
 | :--- | :--- | :--- | :--- |
+| **[`colab_dataset_download.ipynb`](notebooks/colab_dataset_download.ipynb)** | **Dataset Downloader** | ~5 minutes | Automated download of HAM10000 & ISIC 2019 via Kaggle API, Harvard Dataverse direct mirrors, and Google Drive sync |
 | **[`colab_runner_master.ipynb`](notebooks/colab_runner_master.ipynb)** | **Complete Benchmark** | ~3.5 hours | Autonomous master runner: runs B0–B4, P1–P5, S1–S2, and statistical significance analysis |
 | **[`colab_runner_baselines.ipynb`](notebooks/colab_runner_baselines.ipynb)** | CNN Baselines (B0–B4) | ~1.5 hours | Plain CE, Augmentation, Balanced Sampler, Class Weights, Focal Loss |
 | **[`colab_runner_pretrained.ipynb`](notebooks/colab_runner_pretrained.ipynb)** | Foundation Models (P1–P5) | ~25 minutes | Caches DINOv2 (384-d) & BiomedCLIP (512-d) embeddings, trains fast heads |
