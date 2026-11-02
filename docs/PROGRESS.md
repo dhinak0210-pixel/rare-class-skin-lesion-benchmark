@@ -16,11 +16,12 @@
   - [x] MIT License added
   - [x] Master progress checklist initialized (`docs/PROGRESS.md`)
 
-- [ ] **Phase 1: Data Acquisition, Leak-Free Splitting & Leakage Verification**
-  - [ ] HAM10000 download script (`scripts/download_data.sh`) & metadata validator
-  - [ ] Grouped stratified splitting (`scripts/make_splits.py`) by `lesion_id` across 5 folds and 3 seeds (`data/splits.csv`)
-  - [ ] Exploratory Data Analysis (EDA) generation with class/lesion distributions saved to `results/figures/`
-  - [ ] Automated leakage tests (`tests/test_splits.py`, `tests/test_leakage.py`) confirming zero lesion overlap between train/val/test
+- [x] **Phase 1: Data Acquisition, Leak-Free Splitting & Leakage Verification**
+  - [x] HAM10000 download script (`scripts/download_data.sh`) & metadata validator
+  - [x] Grouped stratified splitting (`scripts/make_splits.py`) by `lesion_id` across 5 folds and 3 seeds (`data/splits.csv`)
+  - [x] Exploratory Data Analysis (EDA) generation with class/lesion distributions saved to `results/figures/`
+  - [x] Automated leakage tests (`tests/test_splits.py`, `tests/test_leakage.py`) confirming zero lesion overlap between train/val/test
+  - [x] External test curation (`scripts/prepare_external_set.py`, `data/isic2019_external_metadata.csv`, `docs/external_set.md`) with 15,316 disjoint non-HAM images
 
 - [ ] **Phase 2: CPU End-to-End Pipeline Smoke Test**
   - [ ] Modular components in `src/` (`dataset.py`, `models.py`, `losses.py`, `train.py`, `eval.py`, `utils.py`)
@@ -89,3 +90,10 @@
   - Standardized repository layout created.
   - Core requirements.txt created with strict version constraints.
   - Progression log and verification plan outlined.
+- **Phase 1 Completed:**
+  - HAM10000 metadata and split pipeline constructed (`scripts/make_splits.py`).
+  - 5-fold StratifiedGroupKFold splits generated across 3 seeds (`data/splits.csv`), 100% leak-free.
+  - Exploratory Data Analysis figures generated in `results/figures/`.
+  - ISIC 2019 purged of all HAM10000 images and lesions (`scripts/prepare_external_set.py`), producing `data/isic2019_external_metadata.csv` (15,316 images).
+  - Cleaned external set documented in `docs/external_set.md`.
+  - Unit tests in `tests/test_splits.py` and `tests/test_leakage.py` passing (6/6).

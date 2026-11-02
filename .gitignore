@@ -14,6 +14,7 @@ __pycache__/
 data/medmnist_raw/
 data/images/
 data/generated/
+data/external/
 data/cache_224/
 data/*.h5
 data/*.npy
