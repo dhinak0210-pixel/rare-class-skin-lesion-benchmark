@@ -23,10 +23,11 @@
   - [x] Automated leakage tests (`tests/test_splits.py`, `tests/test_leakage.py`) confirming zero lesion overlap between train/val/test
   - [x] External test curation (`scripts/prepare_external_set.py`, `data/isic2019_external_metadata.csv`, `docs/external_set.md`) with 15,316 disjoint non-HAM images
 
-- [ ] **Phase 2: CPU End-to-End Pipeline Smoke Test**
-  - [ ] Modular components in `src/` (`dataset.py`, `models.py`, `losses.py`, `train.py`, `eval.py`, `utils.py`)
-  - [ ] DermaMNIST / synthetic toy verification on CPU (`tests/test_pipeline_smoke.py`)
-  - [ ] Validation that metrics calculations match `scikit-learn` exactly (`tests/test_metrics.py`)
+- [x] **Phase 2: CPU End-to-End Pipeline Smoke Test**
+  - [x] Modular components in `src/` (`dataset.py`, `models.py`, `losses.py`, `train.py`, `eval.py`, `utils.py`, `synth.py`, `embed.py`, `stats.py`, `gradcam.py`)
+  - [x] DermaMNIST / synthetic toy verification on CPU (`tests/test_pipeline_smoke.py`)
+  - [x] Validation that metrics calculations match `scikit-learn` exactly (`tests/test_metrics.py`)
+  - [x] Full test suite running and passing (14/14 tests)
 
 - [ ] **Phase 3: CNN Baselines (B0–B4) on HAM10000**
   - [ ] B0: Plain cross-entropy EfficientNet-B0
@@ -97,3 +98,7 @@
   - ISIC 2019 purged of all HAM10000 images and lesions (`scripts/prepare_external_set.py`), producing `data/isic2019_external_metadata.csv` (15,316 images).
   - Cleaned external set documented in `docs/external_set.md`.
   - Unit tests in `tests/test_splits.py` and `tests/test_leakage.py` passing (6/6).
+- **Phase 2 Completed:**
+  - Core modular codebase implemented in `src/` (`utils.py`, `eval.py`, `losses.py`, `dataset.py`, `models.py`, `train.py`, `embed.py`, `synth.py`, `stats.py`, `gradcam.py`).
+  - End-to-end CPU smoke tests and metric parity verified against scikit-learn (`tests/test_pipeline_smoke.py`, `tests/test_metrics.py`).
+  - Full automated test suite passing cleanly (14/14 tests).
