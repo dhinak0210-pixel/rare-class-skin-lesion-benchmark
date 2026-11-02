@@ -4,6 +4,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Spaces-Demo-orange)](app/)
 [![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen.svg)](tests/)
 
@@ -74,10 +75,12 @@ research_paper/
 │   ├── eval.py                  # Minority recall, macro F1, AUROC, AUPRC, ECE, referral rules
 │   ├── stats.py                 # 95% bootstrap CIs, paired Wilcoxon tests, table generators
 │   └── gradcam.py               # Saliency maps (Grad-CAM & attention rollout)
-├── notebooks/                   # Self-contained, resumable Kaggle/Colab GPU runners
-│   ├── kaggle_runner_baselines.ipynb   # Runs B0–B4 on Kaggle GPU
-│   ├── kaggle_runner_pretrained.ipynb  # Runs P1–P5 on Kaggle GPU
-│   └── kaggle_runner_synthetic.ipynb   # Runs S1–S2, few-shot curves & final arm
+├── notebooks/                   # Self-contained Google Colab & GPU runner notebooks
+│   ├── colab_runner_master.ipynb     # 🚀 1-Click Autonomous Master Runner (All Arms & Persistence)
+│   ├── colab_runner_baselines.ipynb  # 🔬 Runs B0–B4 (CNN Baselines) on Colab T4 GPU
+│   ├── colab_runner_pretrained.ipynb # 🔬 Runs P1–P5 (DINOv2 & BiomedCLIP Feature Probes)
+│   ├── colab_runner_synthetic.ipynb  # 🔬 Runs S1–S2 (MixUp & SD1.5+LoRA Generative Augmentation)
+│   └── kaggle_runner_baselines.ipynb # Optional Kaggle alternative
 ├── scripts/
 │   ├── download_data.sh         # Data ingestion script
 │   ├── make_splits.py           # Deterministic StratifiedGroupKFold generator & EDA
@@ -131,16 +134,44 @@ python scripts/run_all.py --arms B0 --seeds 42 --folds 0 --epochs 2 --debug
 
 ---
 
-## 5. Kaggle / Colab GPU Benchmark Execution
+## 5. Google Colab GPU Benchmark Execution (Recommended)
 
-For full production runs across the 10,015-image HAM10000 dataset:
-1. Open [Kaggle](https://www.kaggle.com/) and create a new notebook with **GPU (Tesla T4 or P100)** enabled.
-2. Under "Add Data", search and mount: `kmader/skin-cancer-mnist-ham10000`.
-3. Upload and run:
-   - `notebooks/kaggle_runner_baselines.ipynb` (Runs B0–B4)
-   - `notebooks/kaggle_runner_pretrained.ipynb` (Runs P1–P5)
-   - `notebooks/kaggle_runner_synthetic.ipynb` (Runs S1–S2, few-shot curves, final combined)
-4. All runs incrementally flush to `results/logs/runs.csv` and checkpoint every epoch. If a session times out, simply re-run; completed folds are automatically skipped.
+To run the complete benchmark on the full 10,015-image HAM10000 dataset with zero financial cost, we recommend **Google Colab (Free Tier Tesla T4 GPU)** with **Google Drive persistence**.
+
+### Why Google Colab?
+- **Zero Cost:** Free Tesla T4 GPU (15GB VRAM) accessible to any researcher without local GPU hardware.
+- **Drive Persistence:** Automatically syncs `results/logs/runs.csv`, models, and figures directly to `/content/drive/MyDrive/rare_class_benchmark/`. If Colab disconnects or times out, re-running instantly resumes without losing a single fold.
+- **1-Click Master Execution:** Run all 15 benchmark arms end to end, or run modular notebooks per family.
+
+### Notebook Options in `notebooks/`:
+| Notebook | Target Paradigm | Est. Colab Runtime (T4) | Description |
+| :--- | :--- | :--- | :--- |
+| **[`colab_runner_master.ipynb`](notebooks/colab_runner_master.ipynb)** | **Complete Benchmark** | ~3.5 hours | Autonomous master runner: runs B0–B4, P1–P5, S1–S2, and statistical significance analysis |
+| **[`colab_runner_baselines.ipynb`](notebooks/colab_runner_baselines.ipynb)** | CNN Baselines (B0–B4) | ~1.5 hours | Plain CE, Augmentation, Balanced Sampler, Class Weights, Focal Loss |
+| **[`colab_runner_pretrained.ipynb`](notebooks/colab_runner_pretrained.ipynb)** | Foundation Models (P1–P5) | ~25 minutes | Caches DINOv2 (384-d) & BiomedCLIP (512-d) embeddings, trains fast heads |
+| **[`colab_runner_synthetic.ipynb`](notebooks/colab_runner_synthetic.ipynb)** | Synthetic Aug (S1–S2) | ~1.8 hours | MixUp, SD1.5+LoRA @ 50/100/200%, memorization filter, paired hypothesis test |
+
+### Step-by-Step Instructions:
+1. Open [Google Colab](https://colab.research.google.com/) and click **Upload** $\rightarrow$ Select `notebooks/colab_runner_master.ipynb` (or any modular runner notebook).
+2. Enable GPU acceleration:
+   - Click menu **Runtime** $\rightarrow$ **Change runtime type** $\rightarrow$ Select **T4 GPU** $\rightarrow$ Click **Save**.
+3. Run Step 1 & 2 cells to verify GPU and mount your Google Drive:
+   ```python
+   from google.colab import drive
+   drive.mount('/content/drive')
+   ```
+4. Run Step 3 & 4 to install dependencies and ingest HAM10000 images:
+   - *Option A (Fastest, ~45s):* Upload your free Kaggle API token (`kaggle.json` from `kaggle.com/settings`) when prompted; the script will download and unzip the official 10,015 images directly.
+   - *Option B (Automated fallback):* If `kaggle.json` is not provided, the notebook automatically executes `scripts/download_data.sh`.
+   - *Option C (Fast Smoke Test):* Add `--debug` to `run_all.py` to run instantaneously on MedMNIST (DermaMNIST).
+5. Run the experiment execution cell:
+   - Progress is logged live with progress bars. Checkpoints are saved per epoch.
+   - If a disconnection occurs, re-running the cell will skip completed runs and resume from the latest checkpoint.
+6. Run the final aggregation cell:
+   - Produces formatted LaTeX and Markdown tables with 95% bootstrap CIs and paired Wilcoxon test results.
+   - Automatically saves all artifacts to Google Drive and triggers a local browser download of `complete_benchmark_results.zip`.
+
+*(Note: Dual-cloud compatibility is retained with `notebooks/kaggle_runner_baselines.ipynb` for researchers who also use Kaggle.)*
 
 ---
 

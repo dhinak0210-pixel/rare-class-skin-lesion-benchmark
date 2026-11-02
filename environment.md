@@ -10,11 +10,11 @@ This benchmark is engineered to operate strictly under zero financial cost, foll
    - **Memory Footprint:** Kept within standard local RAM limits (< 8GB).
    - **Testing Guardrails:** Fast smoke tests, split leakage checks, and metric parity tests execute in seconds locally.
 
-2. **Tier 2: Production Benchmark Runs (Free Kaggle / Colab GPU)**
-   - **Environment:** Kaggle Kernels (Tesla P100 / T4 × 2) or Google Colab (Tesla T4).
+2. **Tier 2: Production Benchmark Runs (Free Google Colab T4 GPU)**
+   - **Environment:** Google Colab Free Tier (Tesla T4 GPU, 15GB VRAM) with Google Drive mounting for persistence.
    - **Precision:** Mixed-precision (`torch.cuda.amp.autocast()`, fp16/bf16).
-   - **Resilience to Timeouts:** Kaggle interactive sessions time out at 9 hours (or 12 hours batch). Every long experiment script incrementally commits per-epoch checkpoints (`checkpoint.pt`), logs metrics per fold/epoch directly to `results/logs/`, and supports seamless resumption.
-   - **Seeds:** All random number generators (`random`, `numpy`, `torch`, `torch.cuda`) are strictly seeded per configuration.
+   - **Resilience to Timeouts & Disconnections:** Colab sessions can disconnect after inactivity. Every experiment arm incrementally commits per-epoch checkpoints (`checkpoint.pt`), logs metrics per fold/epoch directly to `results/logs/runs.csv`, and automatically syncs checkpoints to mounted Google Drive (`/content/drive/MyDrive/rare_class_benchmark`). Resumption is seamless and idempotent—completed runs are skipped automatically.
+   - **Seeds:** All random number generators (`random`, `numpy`, `torch`, `torch.cuda`) are strictly seeded per configuration (`42`, `1337`, `2024`).
 
 ---
 

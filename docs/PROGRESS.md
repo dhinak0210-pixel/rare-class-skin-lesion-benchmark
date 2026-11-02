@@ -35,7 +35,7 @@
   - [x] B2: B1 + Weighted Random Sampler (balanced oversampling)
   - [x] B3: B1 + Class-weighted cross-entropy loss
   - [x] B4: B1 + Focal loss ($\gamma=2$)
-  - [x] Checkpoint-resumable Kaggle GPU runner notebook (`notebooks/kaggle_runner_baselines.ipynb`)
+  - [x] Checkpoint-resumable Google Colab GPU runner notebook (`notebooks/colab_runner_baselines.ipynb`) with Drive auto-sync
 
 - [x] **Phase 4: Pretrained Foundation Models (P1–P5)**
   - [x] Embeddings extractor (`src/embed.py`) for DINOv2 (`facebook/dinov2-small`) and BiomedCLIP
@@ -44,7 +44,7 @@
   - [x] P3: BiomedCLIP frozen embeddings + Linear Head
   - [x] P4: DINOv2 partial fine-tuning (last 3 blocks, low learning rate)
   - [x] P5: Best foundation setup + Focal Loss
-  - [x] Kaggle GPU runner notebook (`notebooks/kaggle_runner_pretrained.ipynb`)
+  - [x] Google Colab GPU runner notebook (`notebooks/colab_runner_pretrained.ipynb`) with Drive auto-sync
 
 - [x] **Phase 5: Generative Synthetic Augmentation (S1–S3)**
   - [x] Strict isolation guard: generative models train ONLY on training fold `df` images
@@ -55,7 +55,7 @@
   - [x] Blind real-vs-synthetic diagnostic grid generation function
   - [x] Few-shot curve configuration and evaluation pipeline
   - [x] Final combined arm: Best Pretrained + Imbalance Loss + Synthetic Augmentation
-  - [x] Kaggle GPU runner notebook (`notebooks/kaggle_runner_synthetic.ipynb`)
+  - [x] Google Colab GPU runner notebook (`notebooks/colab_runner_synthetic.ipynb`) and Master Runner (`notebooks/colab_runner_master.ipynb`) with Drive persistence
 
 - [x] **Phase 6: Trust, Calibration & Explainability**
   - [x] Post-hoc temperature scaling on validation fold & Expected Calibration Error (ECE)
