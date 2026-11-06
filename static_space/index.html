@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rare-Class Skin Lesion Benchmark & Decision Support</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --danger-bg: #fff1f2;
+            --danger-border: #fecdd3;
+            --danger-text: #9f1239;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .badge:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .disclaimer-card {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            border-left: 5px solid #e11d48;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--danger-text);
+        }
+
+        .disclaimer-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Benchmark Table */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        tr:hover td {
+            background-color: #f1f5f9;
+        }
+
+        .highlight-row {
+            background-color: #f0fdf4 !important;
+            font-weight: 600;
+        }
+
+        .highlight-row td {
+            border-top: 2px solid #86efac;
+            border-bottom: 2px solid #86efac;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .badge-winner {
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .fig-box {
+            text-align: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .fig-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.35rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .fig-caption {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Code block */
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 820px;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .sample-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
+
+        .sample-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 0.35rem;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+        }
+
+        .sample-item span {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge-container">
+        <span class="badge">🔬 Medical Computer Vision</span>
+        <span class="badge">⚡ EfficientNet-B0</span>
+        <span class="badge">📊 Leakage-Controlled</span>
+        <a href="https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark" target="_blank" class="badge">🤗 Model Hub Repo</a>
+    </div>
+    <h1>Rare-Class Skin Lesion Benchmark & Decision Support</h1>
+    <p class="subtitle">A leakage-controlled comparative benchmark of data re-balancing, GAN, and diffusion-based augmentation strategies with selective clinical referral and Grad-CAM interpretability.</p>
+    <div class="btn-group">
+        <a href="https://4902c33db5870b5d1f.gradio.live" target="_blank" class="btn btn-primary">🚀 Launch Live Interactive App</a>
+        <a href="https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark" target="_blank" class="btn btn-outline">📥 Download Weights (.pt)</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Regulatory Warning Banner -->
+    <div class="disclaimer-card">
+        <h3>⚠️ Mandatory Clinical & Regulatory Disclaimer</h3>
+        <p>This system is an academic research prototype designed to evaluate imbalanced multi-class dermatological benchmarks. It is <strong>NOT a certified medical device (CE-IVD / FDA 510(k))</strong> and must <strong>never be used for autonomous clinical diagnosis</strong> or independent medical triage without certified dermatopathologist review.</p>
+    </div>
+
+    <!-- Strategy Comparison Table -->
+    <div class="card">
+        <h2>📊 Empirical Augmentation Strategy Benchmark</h2>
+        <p>Comprehensive evaluation across 7 dermatoscopic lesion categories (with extreme minority rare class <em>dermatofibroma</em>) under patient-level leakage prevention:</p>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Accuracy (Acc.)</th>
+                        <th>Precision (Prec.)</th>
+                        <th>Recall (Rec.)</th>
+                        <th>F1-Score</th>
+                        <th>Balanced Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Original data</strong> (Baseline)</td>
+                        <td>0.82</td>
+                        <td>0.72</td>
+                        <td>0.65</td>
+                        <td>0.67</td>
+                        <td>0.65</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conventional aug.</strong> (Affine / Flips)</td>
+                        <td><span class="metric-badge badge-winner">0.84</span></td>
+                        <td><span class="metric-badge badge-winner">0.74</span></td>
+                        <td>0.69</td>
+                        <td>0.71</td>
+                        <td>0.69</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Class-weighted</strong> (Effective Number)</td>
+                        <td>0.81</td>
+                        <td>0.70</td>
+                        <td><span class="metric-badge badge-winner">0.72</span></td>
+                        <td>0.70</td>
+                        <td><span class="metric-badge badge-winner">0.72</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>GAN-based aug.</strong> (Conditional DCGAN)</td>
+                        <td>0.83</td>
+                        <td>0.73</td>
+                        <td>0.71</td>
+                        <td>0.71</td>
+                        <td>0.71</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>Diffusion-based aug.</strong> (Latent DDPM) 🏆</td>
+                        <td>0.83</td>
+                        <td><span class="metric-badge badge-winner">0.74</span></td>
+                        <td><span class="metric-badge badge-winner">0.72</span></td>
+                        <td><span class="metric-badge badge-winner">0.72</span></td>
+                        <td><span class="metric-badge badge-winner">0.72</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+            * Highlights indicate top-performing empirical results. Diffusion-based augmentation achieves the optimal joint tradeoff between high precision (0.74), rare-class recall (0.72), and balanced accuracy (0.72).
+        </p>
+    </div>
+
+    <!-- Comparative Figures -->
+    <div class="card">
+        <h2>📈 Benchmark Visualizations & Explainability</h2>
+        <div class="grid-2">
+            <div class="fig-box">
+                <img src="assets/strategy_comparison.png" alt="Strategy Comparison Plot">
+                <div class="fig-caption">Figure 1: Multi-metric radar / bar comparison across the 5 training regimes.</div>
+            </div>
+            <div class="fig-box">
+                <img src="assets/prediction_gradcam.png" alt="Grad-CAM Pathology Attention">
+                <div class="fig-caption">Figure 2: Layer-4 Grad-CAM activation heatmap overlaying the pathological lesion core.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Lesion Dataset -->
+    <div class="card">
+        <h2>🧪 Diagnostic Classes Covered</h2>
+        <p>The model is trained on 7 distinct dermatological diagnostic classes:</p>
+        <div class="samples-grid">
+            <div class="sample-item">
+                <img src="assets/samples/sample_mel.png" alt="Melanoma">
+                <span>Melanoma (mel)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_nv.png" alt="Melanocytic Nevus">
+                <span>Nevus (nv)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_bcc.png" alt="Basal Cell Carcinoma">
+                <span>Basal Cell (bcc)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_akiec.png" alt="Actinic Keratosis">
+                <span>Keratosis (akiec)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_bkl.png" alt="Benign Keratosis">
+                <span>Benign Ker. (bkl)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_df.png" alt="Dermatofibroma">
+                <span>Dermatofibroma (df)</span>
+            </div>
+            <div class="sample-item">
+                <img src="assets/samples/sample_vasc.png" alt="Vascular Lesion">
+                <span>Vascular (vasc)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Gradio Interface Embed -->
+    <div class="card">
+        <h2>💻 Live Interactive Inference & Decision Support</h2>
+        <p>Interact directly with the live server below or open in full-screen window:</p>
+        <div style="margin: 1rem 0;">
+            <a href="https://4902c33db5870b5d1f.gradio.live" target="_blank" class="btn btn-primary">
+                🔗 Open Fullscreen Live App (https://4902c33db5870b5d1f.gradio.live)
+            </a>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://4902c33db5870b5d1f.gradio.live" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <!-- Quickstart Code -->
+    <div class="card">
+        <h2>📦 Quickstart: Load from Hugging Face Hub</h2>
+        <p>You can programmatically load the pre-trained weights in PyTorch using the standard Hugging Face Hub library:</p>
+        <pre><code>from huggingface_hub import hf_hub_download
+import torch
+
+# 1. Download model weights from Hugging Face Model Hub
+model_path = hf_hub_download(
+    repo_id="dhina0210/rare-class-skin-lesion-benchmark",
+    filename="best_model.pt"
+)
+
+# 2. Load PyTorch checkpoint
+checkpoint = torch.load(model_path, map_location="cpu")
+print("Checkpoint loaded successfully!")
+print("Num classes:", checkpoint.get("num_classes", 7))
+print("Best test balanced accuracy:", checkpoint.get("test_bal_acc", 0.72))
+</code></pre>
+    </div>
+
+</div>
+
+<footer>
+    <p>Published on Hugging Face Spaces &bull; Model Repository: <a href="https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark" target="_blank">dhina0210/rare-class-skin-lesion-benchmark</a></p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #94a3b8;">For research and academic benchmarking only.</p>
+</footer>
+
+</body>
+</html>
+

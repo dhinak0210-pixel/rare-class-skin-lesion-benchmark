@@ -5,7 +5,9 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/)
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Spaces-Demo-orange)](app/)
+[![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Model%20Hub-dhina0210%2Frare--class--skin--lesion--benchmark-yellow.svg)](https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark)
+[![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Benchmark%20Showcase-blue.svg)](https://huggingface.co/spaces/dhina0210/skin-lesion-benchmark-showcase)
+[![Gradio Live App](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-gradio.live-green.svg)](https://4902c33db5870b5d1f.gradio.live)
 [![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen.svg)](tests/)
 
 > **MANDATORY CLINICAL DISCLAIMER:**  
@@ -75,13 +77,9 @@ research_paper/
 │   ├── eval.py                  # Minority recall, macro F1, AUROC, AUPRC, ECE, referral rules
 │   ├── stats.py                 # 95% bootstrap CIs, paired Wilcoxon tests, table generators
 │   └── gradcam.py               # Saliency maps (Grad-CAM & attention rollout)
-├── notebooks/                   # Self-contained Google Colab & GPU runner notebooks
-│   ├── colab_dataset_download.ipynb  # 📥 Automated Dataset Downloader & Direct Mirrors Pipeline
-│   ├── colab_runner_master.ipynb     # 🚀 1-Click Autonomous Master Runner (All Arms & Persistence)
-│   ├── colab_runner_baselines.ipynb  # 🔬 Runs B0–B4 (CNN Baselines) on Colab T4 GPU
-│   ├── colab_runner_pretrained.ipynb # 🔬 Runs P1–P5 (DINOv2 & BiomedCLIP Feature Probes)
-│   ├── colab_runner_synthetic.ipynb  # 🔬 Runs S1–S2 (MixUp & SD1.5+LoRA Generative Augmentation)
-│   └── kaggle_runner_baselines.ipynb # Optional Kaggle alternative
+├── notebooks/                   # Self-contained Google Colab & GPU model builder notebooks
+│   ├── build_model.ipynb        # 🚀 Interactive Colab Model Builder (Training, Eval, Grad-CAM, Export)
+│   └── colab_build_model.ipynb  # Alternative named mirror for Google Colab and Colab extension
 ├── scripts/
 │   ├── download_data.sh         # Data ingestion script
 │   ├── make_splits.py           # Deterministic StratifiedGroupKFold generator & EDA
@@ -144,36 +142,25 @@ To run the complete benchmark on the full 10,015-image HAM10000 dataset with zer
 - **Drive Persistence:** Automatically syncs `results/logs/runs.csv`, models, and figures directly to `/content/drive/MyDrive/rare_class_benchmark/`. If Colab disconnects or times out, re-running instantly resumes without losing a single fold.
 - **1-Click Master Execution:** Run all 15 benchmark arms end to end, or run modular notebooks per family.
 
-### Notebook Options in `notebooks/`:
-| Notebook | Target Paradigm | Est. Colab Runtime (T4) | Description |
+### Interactive Model Builder Notebook (`notebooks/build_model.ipynb`):
+| Notebook | Target Paradigm | Runtime (T4 GPU) | Description |
 | :--- | :--- | :--- | :--- |
-| **[`colab_dataset_download.ipynb`](notebooks/colab_dataset_download.ipynb)** | **Dataset Downloader** | ~5 minutes | Automated download of HAM10000 & ISIC 2019 via Kaggle API, Harvard Dataverse direct mirrors, and Google Drive sync |
-| **[`colab_runner_master.ipynb`](notebooks/colab_runner_master.ipynb)** | **Complete Benchmark** | ~3.5 hours | Autonomous master runner: runs B0–B4, P1–P5, S1–S2, and statistical significance analysis |
-| **[`colab_runner_baselines.ipynb`](notebooks/colab_runner_baselines.ipynb)** | CNN Baselines (B0–B4) | ~1.5 hours | Plain CE, Augmentation, Balanced Sampler, Class Weights, Focal Loss |
-| **[`colab_runner_pretrained.ipynb`](notebooks/colab_runner_pretrained.ipynb)** | Foundation Models (P1–P5) | ~25 minutes | Caches DINOv2 (384-d) & BiomedCLIP (512-d) embeddings, trains fast heads |
-| **[`colab_runner_synthetic.ipynb`](notebooks/colab_runner_synthetic.ipynb)** | Synthetic Aug (S1–S2) | ~1.8 hours | MixUp, SD1.5+LoRA @ 50/100/200%, memorization filter, paired hypothesis test |
+| **[`build_model.ipynb`](notebooks/build_model.ipynb)** | **End-to-End Model Builder** | ~10-15 minutes | Self-contained Colab notebook: dataset download, imbalance handling, model building, training, evaluation, Grad-CAM, and TorchScript export |
+| **[`colab_build_model.ipynb`](notebooks/colab_build_model.ipynb)** | **Colab Mirror** | ~10-15 minutes | Identical model building pipeline formatted for Google Colab and the Colab VS Code extension |
 
 ### Step-by-Step Instructions:
-1. Open [Google Colab](https://colab.research.google.com/) and click **Upload** $\rightarrow$ Select `notebooks/colab_runner_master.ipynb` (or any modular runner notebook).
+1. Open [Google Colab](https://colab.research.google.com/) and click **Upload** $\rightarrow$ Select `notebooks/build_model.ipynb` (or open it directly via the Colab extension in VS Code / IDE).
 2. Enable GPU acceleration:
    - Click menu **Runtime** $\rightarrow$ **Change runtime type** $\rightarrow$ Select **T4 GPU** $\rightarrow$ Click **Save**.
-3. Run Step 1 & 2 cells to verify GPU and mount your Google Drive:
-   ```python
-   from google.colab import drive
-   drive.mount('/content/drive')
-   ```
-4. Run Step 3 & 4 to install dependencies and ingest HAM10000 images:
-   - *Option A (Fastest, ~45s):* Upload your free Kaggle API token (`kaggle.json` from `kaggle.com/settings`) when prompted; the script will download and unzip the official 10,015 images directly.
-   - *Option B (Automated fallback):* If `kaggle.json` is not provided, the notebook automatically executes `scripts/download_data.sh`.
-   - *Option C (Fast Smoke Test):* Add `--debug` to `run_all.py` to run instantaneously on MedMNIST (DermaMNIST).
-5. Run the experiment execution cell:
-   - Progress is logged live with progress bars. Checkpoints are saved per epoch.
-   - If a disconnection occurs, re-running the cell will skip completed runs and resume from the latest checkpoint.
-6. Run the final aggregation cell:
-   - Produces formatted LaTeX and Markdown tables with 95% bootstrap CIs and paired Wilcoxon test results.
-   - Automatically saves all artifacts to Google Drive and triggers a local browser download of `complete_benchmark_results.zip`.
-
-*(Note: Dual-cloud compatibility is retained with `notebooks/kaggle_runner_baselines.ipynb` for researchers who also use Kaggle.)*
+3. Run the notebook cells sequentially:
+   - **Step 1-3:** Checks GPU accelerator, installs required libraries (`timm`, `medmnist`, etc.), and optionally mounts Google Drive.
+   - **Step 4-6:** Ingests dataset splits, applies data augmentations, and creates PyTorch DataLoaders.
+   - **Step 7:** Visualizes class distribution and sample lesions across all 7 diagnostic categories.
+   - **Step 8-9:** Builds the neural network (pretrained EfficientNet-B0 backbone with customized classification head) and configures cost-sensitive Focal Loss.
+   - **Step 10-11:** Executes model training with mixed precision, learning rate scheduling, validation tracking, and automatic best-checkpoint saving.
+   - **Step 12:** Evaluates the model on the test split, displaying classification metrics and a normalized confusion matrix heatmap.
+   - **Step 13:** Generates Grad-CAM saliency heatmaps to visualize the lesion regions guiding the model's decisions.
+   - **Step 14-15:** Performs single-image inference and exports the trained model to TorchScript (`model_torchscript.pt`) and JSON configuration for deployment.
 
 ---
 

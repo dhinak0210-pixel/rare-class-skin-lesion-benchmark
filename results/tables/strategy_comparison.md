@@ -1,0 +1,10 @@
+# Performance Comparison of Data Augmentation & Imbalance Strategies
+
+| Strategy | Acc. | Prec. | Rec. | F1 | Bal. Acc. |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Original data** | 0.82 | 0.72 | 0.65 | 0.67 | 0.65 |
+| **Conventional aug.** | 0.84 | 0.74 | 0.69 | 0.71 | 0.69 |
+| **Class-weighted** | 0.81 | 0.70 | 0.72 | 0.70 | 0.72 |
+| **GAN-based aug.** | 0.83 | 0.73 | 0.71 | 0.71 | 0.71 |
+| **Diffusion-based aug.** | 0.83 | 0.74 | 0.72 | 0.72 | 0.72 |
+
