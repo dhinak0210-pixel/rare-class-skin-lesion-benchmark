@@ -135,3 +135,4 @@ Diffusion-based aug. (DDPM)     & 0.83 & \textbf{0.74} & \textbf{0.72} & \textbf
 \end{tabular}
 \end{table}
 ```
+

@@ -41,13 +41,13 @@ This repository provides the calibrated **EfficientNet-B0** classifier fine-tune
 
 Evaluated under identical leak-free evaluation protocol across all 5 data augmentation and imbalance strategies:
 
-| Strategy | Acc. | Prec. | Rec. | F1 | Bal. Acc. |
+| Strategy | Accuracy (Acc.) | Precision (Prec.) | Recall (Rec.) | F1-Score | Balanced Accuracy (Bal. Acc.) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Original data** | 0.82 | 0.72 | 0.65 | 0.67 | 0.65 |
-| **Conventional aug.** | 0.84 | 0.74 | 0.69 | 0.71 | 0.69 |
-| **Class-weighted** | 0.81 | 0.70 | 0.72 | 0.70 | 0.72 |
-| **GAN-based aug.** | 0.83 | 0.73 | 0.71 | 0.71 | 0.71 |
-| **Diffusion-based aug.** | 0.83 | 0.74 | 0.72 | 0.72 | 0.72 |
+| **Original data (Baseline)** | 0.82 | 0.72 | 0.65 | 0.67 | 0.65 |
+| **Conventional aug. (Affine / Flips)** | **0.84** | **0.74** | 0.69 | 0.71 | 0.69 |
+| **Class-weighted (Effective Number)** | 0.81 | 0.70 | **0.72** | 0.70 | **0.72** |
+| **GAN-based aug. (Conditional DCGAN)** | 0.83 | 0.73 | 0.71 | 0.71 | 0.71 |
+| **Diffusion-based aug. (Latent DDPM) 🏆** | 0.83 | **0.74** | **0.72** | **0.72** | **0.72** |
 
 ![Benchmark Comparison](strategy_comparison.png)
 
