@@ -7,7 +7,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/)
 [![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Model%20Hub-dhina0210%2Frare--class--skin--lesion--benchmark-yellow.svg)](https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark)
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Benchmark%20Showcase-blue.svg)](https://huggingface.co/spaces/dhina0210/skin-lesion-benchmark-showcase)
-[![Gradio Live App](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-gradio.live-green.svg)](https://4902c33db5870b5d1f.gradio.live)
+[![Gradio Live App](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-gradio.live-green.svg)](https://d657e059c29a3d51e9.gradio.live)
 [![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen.svg)](tests/)
 
 > **MANDATORY CLINICAL DISCLAIMER:**  
