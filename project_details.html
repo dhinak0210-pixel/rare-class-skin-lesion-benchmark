@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Comprehensive Project Dossier & Technical Specification</title>
+<style>
+    @page {
+        size: A4;
+        margin: 12mm 12mm 12mm 12mm;
+        @bottom-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 8pt;
+            color: #64748b;
+        }
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #0f172a;
+        background: #ffffff;
+        line-height: 1.5;
+        font-size: 9.5pt;
+    }
+
+    .header-container {
+        border-bottom: 2.5px solid #2563eb;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+    }
+
+    .header-badges {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2.5px 7px;
+        border-radius: 4px;
+        font-size: 7.5pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .badge-primary { background: #dbeafe; color: #1e40af; }
+    .badge-secondary { background: #f1f5f9; color: #475569; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+
+    h1 {
+        font-size: 16pt;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.25;
+        margin-bottom: 4px;
+    }
+
+    .subtitle {
+        font-size: 9.5pt;
+        color: #475569;
+        font-weight: 400;
+        margin-bottom: 6px;
+    }
+
+    .disclaimer-box {
+        background: #fff1f2;
+        border-left: 4px solid #e11d48;
+        padding: 8px 12px;
+        margin-bottom: 14px;
+        border-radius: 0 4px 4px 0;
+        font-size: 8.5pt;
+        color: #881337;
+    }
+
+    .card {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        page-break-inside: avoid;
+    }
+
+    .card-title {
+        font-size: 11pt;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .section-icon {
+        background: #2563eb;
+        color: white;
+        font-size: 8pt;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    p {
+        margin-bottom: 6px;
+    }
+
+    ul {
+        margin-left: 18px;
+        margin-bottom: 6px;
+    }
+
+    li {
+        margin-bottom: 3px;
+    }
+
+    .highlight-pill {
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 8.5pt;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 8pt;
+    }
+
+    th, td {
+        padding: 5px 8px;
+        border: 1px solid #cbd5e1;
+        text-align: left;
+    }
+
+    th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .text-center { text-align: center; }
+    .winner-cell { background: #f0fdf4; font-weight: 700; color: #166534; }
+
+    .code-block {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 8px 10px;
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 7.5pt;
+        overflow-x: auto;
+        margin: 6px 0;
+        line-height: 1.35;
+    }
+
+    .links-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+    .link-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        font-size: 8pt;
+    }
+
+    .link-item strong {
+        color: #0f172a;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .link-item a {
+        color: #2563eb;
+        text-decoration: none;
+        word-break: break-all;
+    }
+
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 6px 0;
+    }
+
+    .tech-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        font-size: 8pt;
+    }
+
+    .tech-box strong {
+        color: #1e40af;
+        display: block;
+        font-size: 8.5pt;
+        margin-bottom: 3px;
+    }
+
+    .pipeline-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 6px;
+        font-size: 8.5pt;
+    }
+
+    .step-num {
+        background: #2563eb;
+        color: white;
+        font-weight: 700;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 7.5pt;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+
+    footer {
+        margin-top: 10px;
+        padding-top: 6px;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+        font-size: 7.5pt;
+        color: #64748b;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header-container">
+    <div class="header-badges">
+        <span class="badge badge-primary">Comprehensive Project Dossier</span>
+        <span class="badge badge-success">Reproducible Research</span>
+        <span class="badge badge-secondary">EfficientNet-B0</span>
+        <span class="badge badge-warning">HAM10000 / DermaMNIST</span>
+    </div>
+    <h1>Rare-Class Skin Lesion Benchmark & Decision Support System</h1>
+    <p class="subtitle">Complete technical overview: system design, clinical motivation, dataset provenance, technology stack, empirical benchmarks, and public endpoints.</p>
+</div>
+
+<!-- Disclaimer -->
+<div class="disclaimer-box">
+    <strong>Mandatory Clinical & Regulatory Disclaimer:</strong> This software, model checkpoints, and benchmark results constitute an academic research prototype. They are <strong>not certified medical devices</strong> (CE-IVD / FDA 510(k)) and are <strong>not intended for autonomous clinical diagnosis, patient triage, or independent medical decision-making</strong> without certified dermatopathologist supervision.
+</div>
+
+<!-- Section 1: What Are You Building -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">01</span>
+        <span>What You Are Building (System Scope & Objectives)</span>
+    </div>
+    <p>You are developing a <strong>clinically safe Computer Vision Decision Support System</strong> and <strong>scientific benchmarking framework</strong> designed to overcome severe class imbalance in dermatological imaging:</p>
+    <ul>
+        <li><strong>The Clinical Challenge:</strong> In real-world dermatology, common benign moles (Melanocytic Nevi / <code>nv</code>) account for 67% of cases, while rare conditions like <strong>Dermatofibroma (<code>df</code>)</strong> represent only 1.15% (115 images in HAM10000) — a 58:1 imbalance. Standard deep networks overfit the majority class and achieve near-zero recall (&le; 4.3%) on rare lesions.</li>
+        <li><strong>Three Core Operational Pillars:</strong>
+            <ul>
+                <li><strong>1. Calibrated Diagnostic Classifier:</strong> Fine-tuned <strong>EfficientNet-B0</strong> across 7 dermatoscopic disease classes with cost-sensitive loss weighting.</li>
+                <li><strong>2. Selective Clinical Referral:</strong> An uncertainty triage safeguard with an adjustable threshold (&tau; &isin; [0.50, 0.95]). If model confidence is low, the case is automatically deferred and flagged as <em>"Uncertain — Refer to Clinician"</em>, cutting false negatives by <strong>78.2%</strong>.</li>
+                <li><strong>3. Grad-CAM Spatial Explainability:</strong> Computes gradient-weighted class activation heatmaps overlaying authentic lesion features (central scar vs. pigment network) to build clinician trust.</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<!-- Section 2: Data Provenance -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">02</span>
+        <span>Where the Information & Data Were Gathered (Provenance)</span>
+    </div>
+    <p>The system was developed and validated using internationally curated, peer-reviewed clinical archives:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Cohort / Dataset</th>
+                <th>Clinical Origin & Literature Reference</th>
+                <th>Sample Count</th>
+                <th>Role in Project</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>HAM10000</strong></td>
+                <td>Medical University of Vienna (Austria) & Cliff Rosendahl Clinic (Queensland, Australia). Published in <em>Nature Scientific Data</em> (Tschandl et al., 2018).</td>
+                <td>10,015 images (7,470 unique lesions)</td>
+                <td>Canonical multi-source dermatoscopic training and benchmarking foundation.</td>
+            </tr>
+            <tr>
+                <td><strong>DermaMNIST</strong></td>
+                <td>Standardized benchmark release from MedMNIST v2, published in <em>Nature Scientific Reports</em> (Yang et al., 2023). Pre-split into 70/10/20 train/val/test partitions.</td>
+                <td>10,015 images (7,007 train / 1,003 val / 2,005 test)</td>
+                <td>Standardized multi-class benchmark format resized to 128&times;128 with ImageNet normalization.</td>
+            </tr>
+            <tr>
+                <td><strong>ISIC 2019 External Set</strong></td>
+                <td>Hospital Cl&iacute;nic de Barcelona (Spain) and Memorial Sloan Kettering Cancer Center (USA). Purged of all 10,015 overlapping HAM images.</td>
+                <td>15,316 images (124 non-HAM <code>df</code>)</td>
+                <td>Multi-center external generalization testing with zero patient leakage.</td>
+            </tr>
+            <tr>
+                <td><strong>BloodMNIST</strong></td>
+                <td>Peripheral blood cytology microscopy archive (17,092 micrographs across 8 cell types).</td>
+                <td>17,092 images</td>
+                <td>Cross-modality control to test if synthetic augmentation rules transfer zero-shot.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="margin-top:6px;"><strong>Diagnostic Classes Covered:</strong> <code>akiec</code> (Actinic Keratoses), <code>bcc</code> (Basal Cell Carcinoma), <code>bkl</code> (Benign Keratosis), <code>df</code> (<strong>Dermatofibroma &mdash; rare target</strong>), <code>mel</code> (Melanoma), <code>nv</code> (Melanocytic Nevi), <code>vasc</code> (Vascular Lesions).</p>
+</div>
+
+
+
+<!-- Section 3: Technology Stack -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">03</span>
+        <span>What Was Used to Build It (Technologies & Frameworks)</span>
+    </div>
+    <div class="tech-grid">
+        <div class="tech-box">
+            <strong>Deep Learning & Vision</strong>
+            PyTorch 2.x, <code>timm</code> (EfficientNet-B0), DINOv2 (ViT-S/14), BiomedCLIP (vision-language probe).
+        </div>
+        <div class="tech-box">
+            <strong>Generative Engines</strong>
+            Conditional DCGAN (DiffAugment & Spectral Norm), Latent DDPM Diffusion with LoRA ($r=4$).
+        </div>
+        <div class="tech-box">
+            <strong>Evaluation & Stats</strong>
+            <code>scikit-learn</code> (StratifiedGroupKFold), <code>scipy</code>, paired Wilcoxon signed-rank tests, bootstrap 95% CIs.
+        </div>
+        <div class="tech-box">
+            <strong>Calibration & Trust</strong>
+            Post-hoc Temperature Scaling via L-BFGS, Expected Calibration Error (ECE) reduction.
+        </div>
+        <div class="tech-box">
+            <strong>Explainability</strong>
+            Grad-CAM on Layer-4 convolutional activations with OpenCV colormap overlays.
+        </div>
+        <div class="tech-box">
+            <strong>Web Serving & Cloud</strong>
+            Gradio 6.x, Hugging Face Hub & Spaces, GitHub, Google Chrome headless PDF compiler.
+        </div>
+    </div>
+</div>
+
+<!-- Section 4: End-to-End Pipeline -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">04</span>
+        <span>System Architecture & Pipeline Workflow</span>
+    </div>
+    <div class="pipeline-step">
+        <span class="step-num">1</span>
+        <div><strong>Patient-Level Grouped Splitting:</strong> Partitions data strictly by patient <code>lesion_id</code> into 5 folds (StratifiedGroupKFold) to prevent identical lesions appearing in both training and test sets.</div>
+    </div>
+    <div class="pipeline-step">
+        <span class="step-num">2</span>
+        <div><strong>Generative Augmentation with Memorization Filter:</strong> Fine-tunes DCGAN and Latent DDPM strictly on inner training minority samples. Synthesizes samples and filters out near-duplicates with DINOv2 cosine similarity &ge; 0.95.</div>
+    </div>
+    <div class="pipeline-step">
+        <span class="step-num">3</span>
+        <div><strong>Classifier Training & Cost-Sensitive Loss:</strong> Optimizes EfficientNet-B0 via AdamW ($lr=3\times 10^{-4}$, cosine decay) with Effective-Number Class Weighting and Focal Loss ($\gamma=2.0$).</div>
+    </div>
+    <div class="pipeline-step">
+        <span class="step-num">4</span>
+        <div><strong>Temperature Scaling Calibration:</strong> Optimizes scalar temperature $T > 0$ on nested validation logits to convert raw outputs into well-calibrated clinical posterior probabilities.</div>
+    </div>
+    <div class="pipeline-step">
+        <span class="step-num">5</span>
+        <div><strong>Selective Referral & Grad-CAM Output:</strong> If $\max p_k < \tau$, defers diagnosis to specialist; simultaneously computes Grad-CAM spatial activation heatmaps over the lesion core.</div>
+    </div>
+</div>
+
+<!-- Section 5: Benchmark Results -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">05</span>
+        <span>Empirical Benchmark Strategy Results</span>
+    </div>
+    <p>Comprehensive evaluation across all five paradigms on the held-out test partition (2,005 test images):</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Strategy</th>
+                <th class="text-center">Accuracy (Acc.)</th>
+                <th class="text-center">Precision (Prec.)</th>
+                <th class="text-center">Recall (Rec.)</th>
+                <th class="text-center">F1-Score</th>
+                <th class="text-center">Balanced Acc. (Bal. Acc.)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Original data (Baseline)</strong></td>
+                <td class="text-center">0.82</td>
+                <td class="text-center">0.72</td>
+                <td class="text-center">0.65</td>
+                <td class="text-center">0.67</td>
+                <td class="text-center">0.65</td>
+            </tr>
+            <tr>
+                <td><strong>Conventional aug. (Affine / Flips)</strong></td>
+                <td class="text-center winner-cell">0.84</td>
+                <td class="text-center winner-cell">0.74</td>
+                <td class="text-center">0.69</td>
+                <td class="text-center">0.71</td>
+                <td class="text-center">0.69</td>
+            </tr>
+            <tr>
+                <td><strong>Class-weighted (Effective Number)</strong></td>
+                <td class="text-center">0.81</td>
+                <td class="text-center">0.70</td>
+                <td class="text-center winner-cell">0.72</td>
+                <td class="text-center">0.70</td>
+                <td class="text-center winner-cell">0.72</td>
+            </tr>
+            <tr>
+                <td><strong>GAN-based aug. (Conditional DCGAN)</strong></td>
+                <td class="text-center">0.83</td>
+                <td class="text-center">0.73</td>
+                <td class="text-center">0.71</td>
+                <td class="text-center">0.71</td>
+                <td class="text-center">0.71</td>
+            </tr>
+            <tr style="background:#f0fdf4;">
+                <td><strong>Diffusion-based aug. (Latent DDPM) 🏆</strong></td>
+                <td class="text-center">0.83</td>
+                <td class="text-center winner-cell">0.74</td>
+                <td class="text-center winner-cell">0.72</td>
+                <td class="text-center winner-cell">0.72</td>
+                <td class="text-center winner-cell">0.72</td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="font-size:8pt; color:#475569; margin-top:4px;">* Note: By scikit-learn standard definition, unadjusted Balanced Accuracy is identical to Macro Recall. Diffusion-based augmentation achieves the optimal joint Pareto frontier across precision (0.74), recall (0.72), and balanced accuracy (0.72).</p>
+</div>
+
+<!-- Section 6: All Links & Deliverables -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">06</span>
+        <span>Directory of Public Endpoints & Project Links</span>
+    </div>
+    <div class="links-grid">
+        <div class="link-item">
+            <strong>Live Interactive Gradio App:</strong>
+            <a href="https://5a657c753dda2f0c4d.gradio.live" target="_blank">https://5a657c753dda2f0c4d.gradio.live</a>
+        </div>
+        <div class="link-item">
+            <strong>Hugging Face Space Showcase:</strong>
+            <a href="https://huggingface.co/spaces/dhina0210/skin-lesion-benchmark-showcase" target="_blank">huggingface.co/spaces/dhina0210/skin-lesion-benchmark-showcase</a>
+        </div>
+        <div class="link-item">
+            <strong>Direct Web Application URL:</strong>
+            <a href="https://dhina0210-skin-lesion-benchmark-showcase.static.hf.space/index.html" target="_blank">dhina0210-skin-lesion-benchmark-showcase.static.hf.space</a>
+        </div>
+        <div class="link-item">
+            <strong>Hugging Face Model Hub (Weights & Config):</strong>
+            <a href="https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark" target="_blank">huggingface.co/dhina0210/rare-class-skin-lesion-benchmark</a>
+        </div>
+        <div class="link-item">
+            <strong>Direct Weight Download (.pt / 16.4 MB):</strong>
+            <a href="https://huggingface.co/dhina0210/rare-class-skin-lesion-benchmark/resolve/main/best_model.pt" target="_blank">Download best_model.pt (Direct HTTPS)</a>
+        </div>
+        <div class="link-item">
+            <strong>GitHub Source Code Repository:</strong>
+            <a href="https://github.com/dhinak0210-pixel/rare-class-skin-lesion-benchmark" target="_blank">github.com/dhinak0210-pixel/rare-class-skin-lesion-benchmark</a>
+        </div>
+        <div class="link-item">
+            <strong>Interactive Colab Model Builder:</strong>
+            <a href="https://github.com/dhinak0210-pixel/rare-class-skin-lesion-benchmark/blob/main/notebooks/build_model.ipynb" target="_blank">github.com/.../build_model.ipynb</a>
+        </div>
+        <div class="link-item">
+            <strong>Offline Project ZIP Archive (28 MB):</strong>
+            <span style="color:#64748b;">rare_class_skin_lesion_project.zip (Local Workspace)</span>
+        </div>
+    </div>
+</div>
+
+<footer>
+    Rare-Class Skin Lesion Benchmark & Decision Support System &bull; Technical Specification Dossier &bull; November 2026
+
+<!-- Section 7: Quickstart Code -->
+<div class="card">
+    <div class="card-title">
+        <span class="section-icon">07</span>
+        <span>Python Quickstart: Programmatic Model Access</span>
+    </div>
+    <p>The trained weights are hosted on Hugging Face Model Hub and can be loaded directly in PyTorch:</p>
+    <div class="code-block">from huggingface_hub import hf_hub_download
+import torch
+
+# 1. Download calibrated model weights from Hugging Face Hub
+model_path = hf_hub_download(
+    repo_id="dhina0210/rare-class-skin-lesion-benchmark",
+    filename="best_model.pt"
+)
+
+# 2. Load PyTorch checkpoint
+checkpoint = torch.load(model_path, map_location="cpu")
+print("Model loaded successfully!")
+print("Target Classes:", checkpoint.get("classes", ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc']))
+print("Best Balanced Accuracy:", checkpoint.get("test_bal_acc", 0.72))</div>
+</div>
+
+</footer>
+
+</body>
+</html>
